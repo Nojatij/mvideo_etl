@@ -1,48 +1,46 @@
-# Задача на C#
+# Блок 1. SQL
+![Таблица](https://github.com/Nojatij/mvideo_etl/assets/26605856/7db87a6b-393e-43ef-9f81-b7efcd95ed40)
 
-*Напишите на C# библиотеку для поставки внешним клиентам, которая умеет вычислять площадь круга по радиусу и треугольника по трем сторонам. Дополнительно к работоспособности оценим:*
-
- *- Юнит-тесты*
- 
- *- Легкость добавления других фигур*
- 
- *- Вычисление площади фигуры без знания типа фигуры*
- 
- *- Проверку на то, является ли треугольник прямоугольным"*
- 
- ### Решение задачи:
-[ТУТ](https://github.com/Nojatij/Mindbox/tree/master/areaOfFigures) находится класс
-
-[ТУТ](https://github.com/Nojatij/Mindbox/tree/master/Tests) находятся тесты
-
-# Задача на SQL
-
-*В базе данных MS SQL Server есть продукты и категории. Одному продукту может соответствовать много категорий, в одной категории может быть много продуктов. Напишите SQL запрос для выбора всех пар «Имя продукта – Имя категории». Если у продукта нет категорий, то его имя все равно должно выводиться.*
-
-###  Создание структуры БД:
+### 1)	Вывести список сотрудников, получающих заработную плату большую чем у непосредственного руководителя
 ```
- CREATE TABLE categories (
-    categories_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    categories_name VARCHAR(50)
-    );    
- 
- CREATE TABLE products (
-    products_id	INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    products_name VARCHAR(255) NOT NULL,
-    categories_id INT,
-    FOREIGN KEY (categories_id)  REFERENCES categories (categories_id)
-    );
+select a.*
+from   employee a, employee b
+where  b.id = a.chief_id
+and    a.salary > b.salary
 ```
-###  Заполнение базы данных:
+### 2)	Вывести список сотрудников, получающих максимальную заработную плату в своём отделе
 ```
-    INSERT INTO categories(categories_name) VALUES ('Вода'), ('Канцелярия'), ('Еда'), ('Для кухни');
-    INSERT INTO products(products_name, categories_id) VALUES ('Газировка', 1), ('Бумага', 2), ('Ножницы', 2 ), ('Ножницы', 4), ('Ложка', 4), ('Мастер и Маргарита', NULL);
+select a.*
+select a.*
+from   employee a
+where  a.salary = ( select max(salary) from employee b
+                    where  b.department_id = a.department_id )
 ```
-
-### Вывод ответа:
+### 3)	Вывести список ID отделов, количество сотрудников в которых не превышает 3 человек
 ```
- SELECT products_name AS Имя_Продукта, categories_name AS Имя_Категории
- FROM 
-     products LEFT JOIN categories USING(categories_id)
- ORDER BY products_name;
+select department_id
+from   employee
+group  by department_id
+having count(*) <= 3
+```
+### 4)	Вывести список сотрудников, не имеющих назначенного руководителя, работающего в том-же отделе
+```
+select a.*
+from   employee a
+left   join employee b on (b.id = a.chief_id and b.department_id = a.department_id)
+where  b.id is null
+```
+### 5)	Найти список ID отделов с максимальной суммарной зарплатой сотрудников
+```
+with sum_salary as
+  ( select department_id, sum(salary) salary
+    from   employee
+    group  by department_id )
+select department_id
+from   sum_salary a       
+where  a.salary = ( select max(salary) from sum_salary ) 
+```
+### 6)	Скрипт
+```
+Тут скрипт
 ```
