@@ -11,7 +11,6 @@ and    a.salary > b.salary
 ### 2)	Вывести список сотрудников, получающих максимальную заработную плату в своём отделе
 ```
 select a.*
-select a.*
 from   employee a
 where  a.salary = ( select max(salary) from employee b
                     where  b.department_id = a.department_id )
